@@ -1,4 +1,4 @@
-import { getDownloadURL, storage, ref, uploadBytes, uploadBytesResumable } from "./firebase.js";
+import { getDocs, db, collection, addDoc, getDownloadURL, storage, ref, uploadBytes, uploadBytesResumable, doc } from "./firebase.js";
 
 let image = document.getElementById('image');
 let upload = document.getElementById('upload');
@@ -7,6 +7,13 @@ let stop = document.getElementById('stop');
 let cancel = document.getElementById('cancel');
 let state = document.querySelector('#state');
 let loader = document.getElementById('loader');
+
+
+let title = document.getElementById('title');
+let description = document.getElementById('description');
+let submit = document.getElementById('add');
+let data = document.getElementById('data');
+
 let getImage;
 let uploadTask;
 loader.style.display = 'none';
@@ -23,6 +30,10 @@ const uploadFile = () => {
         uploadTask.on('state_changed',
             (snapshot) => {
                 const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                // if (progress !== 100) {
+                //     submit.innerText = "loading........."
+                // }
+
                 // if (progress > 100) {
                 //     state.innerText = ''
                 //     loader.style.display = 'none';
@@ -72,22 +83,22 @@ const uploadFile = () => {
 image.addEventListener('change', uploadFile);
 
 
-start.addEventListener('click', () => {
-    console.log('start');
-    uploadTask.resume();
+// start.addEventListener('click', () => {
+//     console.log('start');
+//     uploadTask.resume();
 
-})
+// })
 
-stop.addEventListener('click', () => {
-    console.log('stop');
-    uploadTask.pause();
+// stop.addEventListener('click', () => {
+//     console.log('stop');
+//     uploadTask.pause();
 
-})
+// })
 
-cancel.addEventListener('click', () => {
-    console.log('cancel');
-    uploadTask.cancel();
-})
+// cancel.addEventListener('click', () => {
+//     console.log('cancel');
+//     uploadTask.cancel();
+// })
 
 
 
@@ -96,26 +107,47 @@ cancel.addEventListener('click', () => {
 // });
 
 
-
-
-const uploaddata = async () => {
+const uploadData = async () => {
     try {
-        const docRef = await addDoc(collection(db, "users"),
-            {
-                title: "sadiq",
-                dis: "sdjfghdkfghdk",
-                image: getImage
-            });
-        abc.innerHTML = `
-            <p>{title}</p>
-            <p>{dis}</p>
-            <img src="{image}"/>
-            `
+        const docRef = await addDoc(collection(db, "blogs"), {
+            title: title.value,
+            description: description.value,
+            blogImg: getImage
+        });
+        showBlogs();
         console.log("Document written with ID: ", docRef.id);
+        // console.log(docRef.data())
     } catch (e) {
         console.error("Error adding document: ", e);
     }
+
+    console.log(title.value, description.value);
 }
 
+submit.addEventListener('click', uploadData);
 
 
+
+
+const showBlogs = async () => {
+    const querySnapshot = await getDocs(collection(db, "blogs"));
+    querySnapshot.forEach((doc) => {
+        console.log(doc.id);
+        const { title, description, blogImg } = doc.data();
+        data.innerHTML += `
+        <h3>${title}</h3>
+        <p>${description.slice(0, 100)}</p>
+        <img src="${blogImg}"/>
+        <button onclick="detailPage('${doc.id}')">view blog</button>
+        `
+    });
+
+}
+showBlogs();
+
+
+
+window.detailPage = (id) => {
+    localStorage.setItem('blogId', id);
+    window.location.href = './blogDetail.html';
+}

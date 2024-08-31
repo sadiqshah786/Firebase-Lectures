@@ -8,17 +8,32 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 
+<style>
+    img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+    }
+</style>
+
 <body>
 
+    <input type="text" id="title"><br>
+    <textarea name="" id="description"></textarea><br>
     <input multiple type="file" name="" id="image" accept="image/*">
-    <!-- <button id="upload">upload</button> -->
     <div id="loader" class="lds-dual-ring"></div>
     <p id="state"></p>
-    <br>
+    <!-- <br>
     <br>
     <button id="stop">stop</button>
     <button id="start">start</button>
-    <button id="cancel">cancel</button>
+    <button id="cancel">cancel</button> -->
+    <button id="add">submit</button>
+
+
+    <div id="data"></div>
+
+
     <script src="upload.js" type="module"></script>
     <script src="firebase.js" type="module"></script>
 </body>
